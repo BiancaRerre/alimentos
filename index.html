@@ -1,5 +1,3 @@
-drag-drop-alimentos
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,27 +7,149 @@ drag-drop-alimentos
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Botão de interrogação para ajuda -->
+  <button id="helpBtn" class="help-btn" title="Explicação das categorias">?</button>
+
   <div id="login-area">
     <label for="playerName">Digite seu nome para participar:</label>
     <input type="text" id="playerName" placeholder="Seu nome" maxlength="30">
+
+    <!-- Seleção de Modo de Jogo -->
+    <div class="mode-selection">
+      <label>Escolha o Modo de Jogo:</label>
+      <div class="mode-options">
+        <div class="mode-card active" data-mode="tradicional" id="mode-tradicional">
+          <h4>🏆 Modo Tradicional</h4>
+          <p>Classifique os 54 alimentos clássicos do jogo em uma rodada rápida.</p>
+        </div>
+        <div class="mode-card" data-mode="fases" id="mode-fases">
+          <h4>🗺️ Modo Aventura</h4>
+          <p>Encare 5 fases progressivas, incluindo novos alimentos!</p>
+        </div>
+      </div>
+    </div>
+
     <button id="startBtn">Começar</button>
+
+    <!-- Como Jogar / Breve explicação -->
+    <div class="instructions-card">
+      <h3>Como Jogar 🎮</h3>
+      <ul>
+        <li>Digite seu nome, escolha o <strong>Modo de Jogo</strong> e clique em <strong>Começar</strong>.</li>
+        <li>Classifique cada alimento arrastando-o para a categoria correta:
+          <ul>
+            <li>🌱 <strong>In Natura</strong>: Alimentos direto da natureza.</li>
+            <li>🥣 <strong>Minimamente Processados</strong>: Alimentos limpos, secos ou cozidos (sem aditivos).</li>
+            <li>🍕 <strong>Ultraprocessados</strong>: Fórmulas industriais cheias de aditivos e conservantes.</li>
+          </ul>
+        </li>
+        <li>No celular ou tablet, basta segurar o alimento para abrir a doca de classificação no rodapé!</li>
+        <li>Ao final da partida, você poderá ver o seu tempo e <strong>clicar nos alimentos que errou</strong> para ler uma explicação detalhada!</li>
+      </ul>
+    </div>
   </div>
   <div id="game-area" style="display:none;">
     <h1>Arraste os alimentos para a categoria correta</h1>
+    <div id="fase-indicator" style="display: none;">Fase 1 de 5</div>
+    <div id="player-info" style="display: none;">
+      <span>Jogador: <strong id="player-display-name"></strong></span>
+      <button id="logoutBtn" class="logout-btn" title="Sair / Mudar de jogador">&times;</button>
+    </div>
     <div id="score"></div>
+    <div id="timer">Tempo: 00:00</div>
     <div class="alimentos" id="alimentos"></div>
     <div class="drop-zones">
-      <div class="drop-zone" data-accept="in-natura">In Natura</div>
-      <div class="drop-zone" data-accept="minimamente">Minimamente Processados</div>
-      <div class="drop-zone" data-accept="ultraprocessado">Ultraprocessados</div>
+      <div class="drop-zone" data-accept="in-natura">
+        <h3>🌱 In Natura</h3>
+        <div class="items-container"></div>
+      </div>
+      <div class="drop-zone" data-accept="minimamente">
+        <h3>🥣 Minimamente Processados</h3>
+        <div class="items-container"></div>
+      </div>
+      <div class="drop-zone" data-accept="ultraprocessado">
+        <h3>🍕 Ultraprocessados</h3>
+        <div class="items-container"></div>
+      </div>
     </div>
     <div id="feedback"></div>
+
+    <!-- Revisão dos Erros ao Final -->
+    <div id="erros-review" class="erros-review" style="display: none;">
+      <h3>🔍 Revisão de Erros</h3>
+      <p>Você cometeu erros nos alimentos abaixo. Clique neles para ver a explicação:</p>
+      <div class="erros-list" id="errosList"></div>
+    </div>
+
+    <button id="nextPhaseBtn" class="next-phase-btn" style="display:none;">Próxima Fase ➡️</button>
     <button id="restartBtn" style="display:none;">Reiniciar</button>
   </div>
+
+  <!-- Doca flutuante para facilitar o arrasto em dispositivos móveis -->
+  <div id="floating-dock" class="floating-dock">
+    <div class="floating-dock-title">Classifique o alimento:</div>
+    <div class="floating-dock-zones">
+      <div class="drop-zone dock-zone in-natura" data-accept="in-natura">
+        <span class="dock-icon">🌱</span>
+        <span class="dock-text">In Natura</span>
+      </div>
+      <div class="drop-zone dock-zone minimamente" data-accept="minimamente">
+        <span class="dock-icon">🥣</span>
+        <span class="dock-text">Minimamente</span>
+      </div>
+      <div class="drop-zone dock-zone ultraprocessado" data-accept="ultraprocessado">
+        <span class="dock-icon">🍕</span>
+        <span class="dock-text">Ultraprocessados</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Explicação das Categorias -->
+  <div id="help-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close-btn" aria-label="Fechar">&times;</button>
+      <h2>Categorias de Alimentos</h2>
+      <div class="modal-body">
+        <div class="modal-section in-natura">
+          <h3>🌱 In Natura</h3>
+          <p>Alimentos obtidos diretamente de plantas ou de animais que não sofrem nenhuma alteração após deixarem a natureza. Exemplos: frutas, verduras, legumes, ovos.</p>
+        </div>
+        <div class="modal-section minimamente">
+          <h3>🥣 Minimamente Processados</h3>
+          <p>Alimentos in natura que passaram por processos simples (limpeza, secagem, moagem, pasteurização) sem adição de sal, açúcar ou gorduras. Exemplos: arroz, feijão, aveia, leite, carnes frescas.</p>
+        </div>
+        <div class="modal-section ultraprocessado">
+          <h3>🍕 Ultraprocessados</h3>
+          <p>Formulações industriais com muitos ingredientes e aditivos químicos (corantes, aromatizantes, conservantes). Geralmente contêm muito sal, açúcar ou gordura. Exemplos: refrigerantes, salgadinhos, biscoitos recheados, nuggets, salsicha.</p>
+        </div>
+      </div>
+      <button id="closeHelpBtn" class="modal-confirm-btn">Entendi!</button>
+    </div>
+  </div>
+
+  <!-- Modal de Detalhe do Alimento (Exposição de erro) -->
+  <div id="food-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close-btn" aria-label="Fechar">&times;</button>
+      <div class="food-modal-content">
+        <img id="foodModalImg" src="" alt="" class="food-modal-img">
+        <h2 id="foodModalName">Nome do Alimento</h2>
+        <div class="food-modal-info">
+          <p><strong>Sua escolha:</strong><br><span id="foodModalYourChoice" class="choice-wrong"></span></p>
+          <p><strong>Categoria correta:</strong><br><span id="foodModalCorrect" class="choice-correct"></span></p>
+        </div>
+        <div class="food-modal-desc-box">
+          <p id="foodModalDesc"></p>
+        </div>
+      </div>
+      <button id="closeFoodModalBtn" class="modal-confirm-btn">Fechar</button>
+    </div>
+  </div>
+
   <!-- Firebase App (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <!-- Firebase Database (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js?v=2"></script>
 </body>
 </html>
