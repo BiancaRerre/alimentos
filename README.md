@@ -1,4 +1,4 @@
-# Jogo de Classificação de Alimentos (NOVA) 🍎🥣🍕
+# Jogo de Classificação de Alimentos  🍎🥣🍕
 
 Um jogo educativo, interativo e altamente polido projetado para ensinar os jogadores a classificar alimentos de acordo com o **Guia Alimentar para a População Brasileira** (Sistema de Classificação NOVA):
 - 🌱 **In Natura**
